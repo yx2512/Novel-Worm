@@ -2,11 +2,11 @@ package engine
 
 import (
 	"log"
-
-	"github.com/yx2512/crawler/fetcher"
 )
 
-func Run(seeds ...Request) {
+type SimpleEngine struct{}
+
+func (se SimpleEngine) Run(seeds ...Request) {
 	var requests []Request
 	requests = append(requests, seeds...)
 
@@ -27,18 +27,4 @@ func Run(seeds ...Request) {
 		}
 
 	}
-}
-
-func worker(r Request) (ParseResult, error) {
-	log.Printf("Fetching %s\n", r.Url)
-	body, err := fetcher.Fetch(r.Url)
-
-	if err != nil {
-		log.Printf("Fetcher: error fetching url: %s with error: %v", r.Url, err)
-		return ParseResult{}, err
-	}
-
-	parseResult := r.ParserFunc(body)
-
-	return parseResult, nil
 }
