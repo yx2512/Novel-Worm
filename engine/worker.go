@@ -7,7 +7,6 @@ import (
 )
 
 func worker(r Request) (ParseResult, error) {
-	log.Printf("Fetching %s\n", r.Url)
 	body, err := fetcher.Fetch(r.Url)
 
 	if err != nil {
