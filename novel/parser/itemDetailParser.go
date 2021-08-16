@@ -4,6 +4,7 @@ import (
 	"github.com/yx2512/crawler/engine"
 	"github.com/yx2512/crawler/model"
 	"regexp"
+	"strconv"
 )
 
 var authorRe = regexp.MustCompile(`<meta property="og:novel:author" content="([^"]+)"/>`)
@@ -11,6 +12,8 @@ var statusRe = regexp.MustCompile(`<meta property="og:novel:status" content="([^
 var updateTimeRe = regexp.MustCompile(`<p>更新时间：([^&]+)`)
 var newestChapterRe = regexp.MustCompile(`<meta property="og:novel:latest_chapter_name" content="([^"]+)"/>`)
 var recommendationRe = regexp.MustCompile(`<a href="(https://www.xbiquge.so/book/[0-9]+/)"[^>]*>([^<]+)</a>`)
+var categoryRe = regexp.MustCompile(`<meta property="og:novel:category" content="([^"]+)"/>`)
+var clickCntRe = regexp.MustCompile(`<a href="javascript:;" onclick="vote\('([0-9]+)'\);"[^>]+>投票推荐</a>`)
 
 func ParseItemProfile(contents []byte, title string) engine.ParseResult {
 	profile := model.Profile{}
@@ -22,6 +25,14 @@ func ParseItemProfile(contents []byte, title string) engine.ParseResult {
 	profile.UpdateTime = extractString(contents, updateTimeRe)
 	profile.NewestChapter = extractString(contents, newestChapterRe)
 	profile.Status = extractString(contents, statusRe)
+	profile.Category = extractString(contents, categoryRe)
+	clickCnt, err := strconv.Atoi(extractString(contents, clickCntRe))
+
+	if err != nil {
+		clickCnt = 0
+	}
+
+	profile.ClickCnt = clickCnt
 
 	result := engine.ParseResult{
 		Items: []interface{}{profile},
